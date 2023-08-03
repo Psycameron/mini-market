@@ -1,13 +1,21 @@
 const gulp = require("gulp");
 const fileInclude = require("gulp-file-include");
 const sass = require("gulp-sass")(require("sass"));
+const server = require("gulp-server-livereload");
+const clean = require("gulp-clean");
+const fs = require("fs");
 
 const fileIncludeSettings = {
   prefix: "@@",
   basepath: "@file",
 };
 
-gulp.task("includeFiles", function () {
+const serverSettings = {
+  livereload: true,
+  open: true,
+};
+
+gulp.task("html", function () {
   return gulp
     .src("./src/*.html")
     .pipe(fileInclude(fileIncludeSettings))
@@ -21,6 +29,17 @@ gulp.task("sass", function () {
     .pipe(gulp.dest("./dist/css/"));
 });
 
-gulp.task("copyImages", function () {
+gulp.task("images", function () {
   return gulp.src("./src/images/**/*").pipe(gulp.dest("./dist/images/"));
+});
+
+gulp.task("server", function () {
+  return gulp.src("./dist/").pipe(server(serverSettings));
+});
+
+gulp.task("clean", function (done) {
+  if (fs.existsSync("./dist/")) {
+    return gulp.src("./dist/", { read: false }).pipe(clean());
+  }
+  done();
 });

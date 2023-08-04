@@ -4,6 +4,9 @@ const sass = require("gulp-sass")(require("sass"));
 const server = require("gulp-server-livereload");
 const clean = require("gulp-clean");
 const fs = require("fs");
+const sourceMaps = require("gulp-sourcemaps");
+const plumber = require("gulp-plumber");
+const notify = require("gulp-notify");
 
 const fileIncludeSettings = {
   prefix: "@@",
@@ -15,9 +18,20 @@ const serverSettings = {
   open: true,
 };
 
+const plumberConfig = (title) => {
+  return {
+    errorHandler: notify.onError({
+      title,
+      message: "Error <%= error.message %> ",
+      sound: false,
+    }),
+  };
+};
+
 gulp.task("html", function () {
   return gulp
     .src("./src/*.html")
+    .pipe(plumber(plumberConfig("HTML")))
     .pipe(fileInclude(fileIncludeSettings))
     .pipe(gulp.dest("./dist/"));
 });
@@ -25,7 +39,10 @@ gulp.task("html", function () {
 gulp.task("sass", function () {
   return gulp
     .src("./src/scss/*.scss")
+    .pipe(plumber(plumberConfig("Styles")))
+    .pipe(sourceMaps.init())
     .pipe(sass())
+    .pipe(sourceMaps.write())
     .pipe(gulp.dest("./dist/css/"));
 });
 
@@ -43,3 +60,18 @@ gulp.task("clean", function (done) {
   }
   done();
 });
+
+gulp.task("watch", function () {
+  gulp.watch("./src/scss/**/*.scss", gulp.parallel("sass"));
+  gulp.watch("./src/**/*.html", gulp.parallel("html"));
+  gulp.watch("./src/images/**/*", gulp.parallel("images"));
+});
+
+gulp.task(
+  "default",
+  gulp.series(
+    "clean",
+    gulp.parallel("html", "sass", "images"),
+    gulp.parallel("watch", "server")
+  )
+);

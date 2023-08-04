@@ -1,0 +1,8 @@
+.footer {
+  padding: 80px 0;
+  font-size: 20px;
+
+  @media (max-width: 1200px) {
+    background-color: orange;
+  }
+}

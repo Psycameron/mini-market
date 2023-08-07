@@ -11,6 +11,7 @@ const notify = require("gulp-notify");
 const webpack = require("webpack-stream");
 const babel = require("gulp-babel");
 const imagemin = require("gulp-imagemin");
+const changed = require("gulp-changed");
 
 // ========= Configs for Gulp tasks ==============
 
@@ -39,6 +40,7 @@ const plumberConfig = (title) => {
 gulp.task("html", function () {
   return gulp
     .src("./src/*.html")
+    .pipe(changed("./dist/"))
     .pipe(plumber(plumberConfig("HTML")))
     .pipe(fileInclude(fileIncludeSettings))
     .pipe(gulp.dest("./dist/"));
@@ -47,6 +49,7 @@ gulp.task("html", function () {
 gulp.task("sass", function () {
   return gulp
     .src("./src/scss/*.scss")
+    .pipe(changed("./dist/css/"))
     .pipe(plumber(plumberConfig("Styles")))
     .pipe(sourceMaps.init())
     .pipe(sass())
@@ -57,6 +60,7 @@ gulp.task("sass", function () {
 gulp.task("images", function () {
   return gulp
     .src("./src/images/**/*")
+    .pipe(changed("./dist/images/"))
     .pipe(imagemin({ verbose: true }))
     .pipe(gulp.dest("./dist/images/"));
 });
@@ -64,6 +68,7 @@ gulp.task("images", function () {
 gulp.task("js", function () {
   return gulp
     .src("./src/js/*.js")
+    .pipe(changed("./dist/js/"))
     .pipe(plumber(plumberConfig("JS")))
     .pipe(babel())
     .pipe(webpack(require("./webpack.config.js")))

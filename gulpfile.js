@@ -8,6 +8,11 @@ const sourceMaps = require("gulp-sourcemaps");
 const plumber = require("gulp-plumber");
 const notify = require("gulp-notify");
 
+const webpack = require("webpack-stream");
+const babel = require("gulp-babel");
+
+// ========= Configs for Gulp tasks ==============
+
 const fileIncludeSettings = {
   prefix: "@@",
   basepath: "@file",
@@ -27,6 +32,8 @@ const plumberConfig = (title) => {
     }),
   };
 };
+
+// ============= Gulp Tasks ==============
 
 gulp.task("html", function () {
   return gulp
@@ -50,6 +57,15 @@ gulp.task("images", function () {
   return gulp.src("./src/images/**/*").pipe(gulp.dest("./dist/images/"));
 });
 
+gulp.task("js", function () {
+  return gulp
+    .src("./src/js/*.js")
+    .pipe(plumber(plumberConfig("JS")))
+    .pipe(babel())
+    .pipe(webpack(require("./webpack.config.js")))
+    .pipe(gulp.dest("./dist/js/"));
+});
+
 gulp.task("server", function () {
   return gulp.src("./dist/").pipe(server(serverSettings));
 });
@@ -65,13 +81,14 @@ gulp.task("watch", function () {
   gulp.watch("./src/scss/**/*.scss", gulp.parallel("sass"));
   gulp.watch("./src/**/*.html", gulp.parallel("html"));
   gulp.watch("./src/images/**/*", gulp.parallel("images"));
+  gulp.watch("./src/js/**/*.js", gulp.parallel("js"));
 });
 
 gulp.task(
   "default",
   gulp.series(
     "clean",
-    gulp.parallel("html", "sass", "images"),
+    gulp.parallel("html", "sass", "images", "js"),
     gulp.parallel("watch", "server")
   )
 );

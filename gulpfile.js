@@ -10,6 +10,7 @@ const notify = require("gulp-notify");
 
 const webpack = require("webpack-stream");
 const babel = require("gulp-babel");
+const imagemin = require("gulp-imagemin");
 
 // ========= Configs for Gulp tasks ==============
 
@@ -54,7 +55,10 @@ gulp.task("sass", function () {
 });
 
 gulp.task("images", function () {
-  return gulp.src("./src/images/**/*").pipe(gulp.dest("./dist/images/"));
+  return gulp
+    .src("./src/images/**/*")
+    .pipe(imagemin({ verbose: true }))
+    .pipe(gulp.dest("./dist/images/"));
 });
 
 gulp.task("js", function () {

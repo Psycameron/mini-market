@@ -1,6 +1,7 @@
 const gulp = require("gulp");
 const fileInclude = require("gulp-file-include");
 const sass = require("gulp-sass")(require("sass"));
+const sassGlob = require("gulp-sass-glob");
 const server = require("gulp-server-livereload");
 const clean = require("gulp-clean");
 const fs = require("fs");
@@ -13,7 +14,7 @@ const babel = require("gulp-babel");
 const imagemin = require("gulp-imagemin");
 const changed = require("gulp-changed");
 
-// ========= Configs for Gulp tasks ==============
+// ============== Configs for Gulp tasks ==============
 
 const fileIncludeSettings = {
   prefix: "@@",
@@ -35,7 +36,7 @@ const plumberConfig = (title) => {
   };
 };
 
-// ============= Gulp Tasks ==============
+// ============== Gulp tasks ==============
 
 gulp.task("html", function () {
   return gulp
@@ -52,6 +53,7 @@ gulp.task("sass", function () {
     .pipe(changed("./dist/css/"))
     .pipe(plumber(plumberConfig("Styles")))
     .pipe(sourceMaps.init())
+    .pipe(sassGlob())
     .pipe(sass())
     .pipe(sourceMaps.write())
     .pipe(gulp.dest("./dist/css/"));
@@ -75,6 +77,8 @@ gulp.task("js", function () {
     .pipe(gulp.dest("./dist/js/"));
 });
 
+// ============== Server tasks ==============
+
 gulp.task("server", function () {
   return gulp.src("./dist/").pipe(server(serverSettings));
 });
@@ -92,6 +96,8 @@ gulp.task("watch", function () {
   gulp.watch("./src/images/**/*", gulp.parallel("images"));
   gulp.watch("./src/js/**/*.js", gulp.parallel("js"));
 });
+
+// ============== Default task ==============
 
 gulp.task(
   "default",

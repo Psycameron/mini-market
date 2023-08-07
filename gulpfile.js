@@ -39,7 +39,7 @@ const plumberConfig = (title) => {
 
 gulp.task("html", function () {
   return gulp
-    .src("./src/*.html")
+    .src("./src/html/**/*.html")
     .pipe(changed("./dist/"))
     .pipe(plumber(plumberConfig("HTML")))
     .pipe(fileInclude(fileIncludeSettings))

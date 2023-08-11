@@ -1,11 +1,19 @@
 const gulp = require("gulp");
 const fs = require("fs");
-const fileInclude = require("gulp-file-include");
 
+// HTML
+const fileInclude = require("gulp-file-include");
+const htmlclean = require("gulp-htmlclean");
+
+// SASS
 const sass = require("gulp-sass")(require("sass"));
 const sassGlob = require("gulp-sass-glob");
 const autoprefixer = require("gulp-autoprefixer");
 const ccso = require("gulp-csso");
+
+// Images
+const imagemin = require("gulp-imagemin");
+const webp = require("gulp-webp");
 
 const server = require("gulp-server-livereload");
 const clean = require("gulp-clean");
@@ -16,7 +24,6 @@ const notify = require("gulp-notify");
 
 const webpack = require("webpack-stream");
 const babel = require("gulp-babel");
-const imagemin = require("gulp-imagemin");
 const changed = require("gulp-changed");
 
 // ============== Configs for Gulp tasks ==============
@@ -49,6 +56,7 @@ gulp.task("html:docs", function () {
     .pipe(changed("./docs/"))
     .pipe(plumber(plumberConfig("HTML")))
     .pipe(fileInclude(fileIncludeSettings))
+    .pipe(htmlclean())
     .pipe(gulp.dest("./docs/"));
 });
 
@@ -69,6 +77,11 @@ gulp.task("sass:docs", function () {
 gulp.task("images:docs", function () {
   return gulp
     .src("./src/images/**/*")
+    .pipe(changed("./docs/images/"))
+    .pipe(webp())
+    .pipe(gulp.src("./docs/images/"))
+
+    .pipe(gulp.src("./src/images/**/*"))
     .pipe(changed("./docs/images/"))
     .pipe(imagemin({ verbose: true }))
     .pipe(gulp.dest("./docs/images/"));
